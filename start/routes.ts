@@ -17,12 +17,15 @@
 | import './routes/customer'
 |
 */
-
+import 'App/Modules/User/routes'
 import Route from '@ioc:Adonis/Core/Route'
 import Database from '@ioc:Adonis/Lucid/Database'
 
 Route.get('/', async () => {
   return Database.from('users').select('*')
 })
+Route.group(() => {
+  Route.post('/login', 'AuthController.login')
+})
 
-Route.post('/login', 'AuthController.login')
+
