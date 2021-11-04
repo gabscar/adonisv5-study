@@ -1,8 +1,7 @@
 import { DateTime } from 'luxon'
-
-import { v4 as uuidv4 } from 'uuid';
-
-import { BaseModel, column, beforeCreate } from '@ioc:Adonis/Lucid/Orm'
+import Hash from '@ioc:Adonis/Core/Hash'
+import { v4 as uuidv4 } from 'uuid'
+import { BaseModel, column, beforeCreate, beforeSave } from '@ioc:Adonis/Lucid/Orm'
 
 export default class User extends BaseModel {
   public static table = 'users'
@@ -19,7 +18,7 @@ export default class User extends BaseModel {
   @column()
   public email: string
 
-  @column({})
+  @column()
   public password: string
 
   @column.dateTime({ autoCreate: true })
@@ -31,5 +30,11 @@ export default class User extends BaseModel {
   @beforeCreate()
   public static assignUuid(user: User) {
     user.secure_id = uuidv4()
+  }
+  @beforeSave()
+  public static async hashPassword(user: User) {
+    if (user.$dirty.password) {
+      user.password = await Hash.make(user.password)
+    }
   }
 }
